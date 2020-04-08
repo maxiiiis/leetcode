@@ -17,7 +17,7 @@ public:
             rev=rev*10+pop;//把数字pop弹入rev  （不需要单独考虑正负，因为pop是带符号的）
         }
         
-        return rev;//无实际作用
+        return rev;//若输入x为0，则反转后还是0
     }
     
     
