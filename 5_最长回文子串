@@ -1,0 +1,146 @@
+class Solution {//找到第一个最长的回文子串(若有多个相同长度的最长回文子串，只输出第一个)
+public:
+    /*
+    string longestPalindrome(string s) {
+        //暴力遍历法：遍历字符串s的所有子串并判断当前子串是不是回文 O(n^3)（超时！）
+        //长度为n的字符串s的所有子串：可看作s[0]、s[1]、……、s[n-1]以及所有以它们开头的子串(从左往右)，共n+(n-1)+(n-2)+……+1个子串
+        int maxlength=0;//当前所找到的最长的回文子串的长度
+        string substring;
+        string maxpalindrome;
+        for(int start=0; start<s.size(); start++)//两层循环遍历所有子串 
+        {
+            for(int end=start; end<s.size(); end++)
+            {
+                substring+=s[end];//不能写 substring.append(s[end]); 因为s[end]是char的引用类型
+                if((substring.size()>maxlength)&&isPalindrome(substring))//(substring.size()>maxlength)条件要放在isPalindrome()前面，能提升效率
+                {
+                    maxlength=substring.size();
+                    maxpalindrome=substring;
+                }
+            }
+            substring.clear();
+        }
+        return maxpalindrome;        
+    }
+    */
+    
+    /*
+    string longestPalindrome(string s) {
+        //优化的暴力遍历法1：下一个遍历的子串一定要比 当前所找到的最长的回文子串 更长 （通过，1836ms）
+        int maxlength=0;//当前所找到的最长的回文子串的长度
+        string substring;
+        string maxpalindrome;
+        for(int start=0; start<s.size(); start++)
+        {
+            for(int end=start; end<s.size(); end++)
+            {
+                substring+=s[end];//如果用①int end=start+maxlength; ②substring=s.substr(start,end-start+1); 会大大降低效率以至于不通过
+                if(maxlength>=substring.size())
+                    continue;
+                if(isPalindrome(substring))
+                {
+                    maxlength=substring.size();
+                    maxpalindrome=substring;
+                }
+            }
+            substring.clear();
+        }
+        return maxpalindrome;        
+    }
+    */
+    
+    /*
+    string longestPalindrome(string s) {
+        //优化的暴力遍历法2：(通过，420ms)
+        //回文的任意子串都一定能在rev中找到（rev由s反转得到）; 反过来说,若某一子串在rev中找不到,则该子串一定不是回文,且包含该子串的字符串也不可能是回文
+        //注意：能在rev中找到的子串也不一定是回文,要进一步判断,必须满足该子串在s和rev中所处的位置是“相对应的”这一条件（保证rev中的该子串是由s中的该子串反转得到的）
+        int maxlength=0;//当前所找到的最长的回文子串的长度
+        string substring;
+        string maxpalindrome;
+        string rev=s;
+        reverse(rev.begin(),rev.end());
+        int position;//substring在rev中的起始下标
+        for(int start=0; start<s.size(); start++)
+        {
+            for(int end=start; end<s.size(); end++)
+            {
+                substring+=s[end];
+                if(maxlength>=substring.size())
+                    continue;
+                position=rev.find(substring);//string的find()方法会返回第一次出现(注意!)的所要寻找子串的起始下标,其返回值类型实际上是string::size_type(一般是unsigned int),若找不到则会返回string::npos(size_type类型,表示size_type类型的最大值)，所以此处把position定义为int类型,在某些机器上可能会出现问题
+                if(position==-1)//当前子串在rev中找不到，则由start开头的剩下的子串也没必要遍历了
+                    break;
+                else if((end+position)==(s.size()-1))//当前子串在rev中找到了,且在s和rev中的位置相对应
+                {
+                    maxlength=substring.size();
+                    maxpalindrome=substring;
+                }//若当前子串能在rev中找到,但不满足在s和rev中的位置相对应这一条件,也不能说明由当前start开头的剩下子串就一定不是回文
+            }
+            substring.clear();
+        }
+        return maxpalindrome;        
+    }
+    */
+    
+    string longestPalindrome(string s) {//找到最后一个最长的回文子串(若有多个相同长度的最长回文子串，只输出最后一个)
+    //动态规划版的暴力求解  （通过，276ms）
+    //时间复杂度：O(n^2)  空间复杂度：O(n^2)（可优化空间复杂度O(n)）
+    //状态dp[i][j]表示：从i到j的子串是不是回文
+    //状态转移方程：对长度大于2的子串，dp[i][j]=( s[i]==s[j] && dp[i+1][j-1] )
+    //边界状态：长度为1的子串肯定是回文，长度为2的子串只需判断首尾字符是否相等（长度为3的子串也可以只判断首尾字符）
+    //其他子串除了要判断首尾字符是否相等，还要利用左下角的子串状态(i+1、j-1)，所以要注意填表顺序
+        
+        int maxlength=1,maxstart=0;//只需起始下标和长度就能确定一个子串，相比截取子串能节省资源消耗（此处将回文初始化为字符串s的第一个字符）
+        bool dp[s.size()][s.size()];
+                
+        for(int i=s.size()-2; i>=0; i--)//注意填表顺序（先从左到右，从下到上）
+        {
+            for(int j=i+1; j<s.size(); j++)
+            {
+                //初始化表格的对角线（长度为1的边界状态）（实际上也可以省去这步，因为长度为1的子串肯定是回文，长度为3的子串可以不利用这些长度为1的子串状态而直接判断）
+                //if(i==j) dp[i][j]=true;       (int i=s.size()-1;      int j=i; )
+                if((j-i+1==2)||(j-i+1==3)) //长度为2或3
+                    dp[i][j] = (s[i]==s[j]);
+                else //长度大于3
+                    dp[i][j] =( (s[i]==s[j]) && dp[i+1][j-1] );
+                    
+                if( dp[i][j] && (j-i+1)>maxlength )
+                {
+                    maxlength=j-i+1;
+                    maxstart=i;
+                }
+            }  
+        }
+        return s.substr(maxstart,maxlength);        
+    }
+   
+    
+    
+private:  
+    bool isPalindrome(string &s)//参数改为string类的引用，能提升效率
+    {
+        //对长度为n的字符串s,时间复杂度为O(n/2)
+        int start=0,end=s.size()-1;
+        while(start<end)//奇数字符串以start==end结束,偶数字符串以start>end结束
+        {
+            if(s[start]!=s[end])
+                return false;
+            start++;
+            end--;
+        }
+        return true;
+    }
+    
+    /*
+    bool isPalindrome(string &s)//参数改为string类的引用，能提升效率
+    {
+        //若字符串s反转后还是自己本身,则s是回文
+        string rev=s;
+        reverse(rev.begin(),rev.end());//reverse()是STL标准库函数，左开右闭
+        if(rev==s) return true;
+        else return false;
+    }
+    */
+    
+    
+};
