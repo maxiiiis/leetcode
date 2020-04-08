@@ -1,0 +1,74 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {//本质是大数相加问题，直接用系统提供的数据类型满足不了所需的数据长度，故将数字以链表形式拆分存放
+public:
+    //本函数中将l1、l2指针往后移，但并不会改变这两指针的真实指向，它们还是指向链首，因为传入的参数是指针，相当于指针的传值调用
+    //但此函数改变了l2链表的内容
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
+    {
+        int carry=0;//进位
+        ListNode* sumhead=l2;//把结果放入l2链表
+        while(l1->next!=NULL)//此循环结束后，l2链表的长度一定大于等于l1链表
+        {
+            if(l2->next==NULL)
+                addNode(l2,0);
+            if(l1->val+l2->val+carry<10)
+            {
+                l2->val=l1->val+l2->val+carry;
+                carry=0;
+            }
+            else
+            {
+                l2->val=l1->val+l2->val+carry-10;
+                carry=1;
+            }
+            l1=l1->next;
+            l2=l2->next;
+        }
+        
+        //处理l1的最后一个节点
+        if(l1->val+l2->val+carry<10)
+        {
+            l2->val=l1->val+l2->val+carry;
+            carry=0;
+        }
+        else
+        {
+            l2->val=l1->val+l2->val+carry-10;
+            carry=1;
+            //处理进位
+            while(l2->next!=NULL)
+            {
+                l2=l2->next;
+                if(l2->val+carry<10)
+                {
+                    l2->val+=carry;
+                    carry=0;
+                    break;
+                }  
+                else
+                {
+                    l2->val=l2->val+carry-10;//此时l2->val为0
+                    carry=1;
+                }                    
+            }
+            if(carry==1)
+                addNode(l2,carry);      
+        }
+        
+        return sumhead;
+    }
+
+
+    //在p指向的节点后添加一个val为x的新节点，返回值指向新节点
+    ListNode* addNode(ListNode* p, int x){
+        p->next = new ListNode(x);//对new来的内存空间要记得delete
+        return p->next;
+    }
+};
