@@ -1,0 +1,20 @@
+class Solution {//参考第七题：整数反转
+public:
+    bool isPalindrome(int x) {
+        if(x<0) return false;//负数一定不是回文
+        
+        int rev=0;//反转后的数字用int型，注意考虑溢出问题
+        int pop;
+        int input=x;
+        while(input!=0)//此处x一定为正数
+        {
+            pop=input%10;
+            input=input/10;
+            if(rev>(INT_MAX/10)||(rev==(INT_MAX/10)&&pop>7)) return false;//回文一定不会溢出，因为输入的回文是int型，回文反转后还是自己本身，所以还在int的范围内；故溢出的一定不是回文
+            rev=rev*10+pop;
+        }
+        if(rev==x) return true;
+        else return false;
+        
+    }
+};
