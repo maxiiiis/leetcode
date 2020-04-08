@@ -1,0 +1,48 @@
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {//哈希查找 O(1)*n=O(n)
+        unordered_map<int,int> m;
+        int diff;
+        unordered_map<int,int>::iterator iter;
+        vector<int> result;
+        for(int i=0; i<nums.size(); i++){
+            diff=target-nums[i];
+            iter=m.find(diff);//哈希查找
+            if(iter!=m.end()){
+                result.push_back(iter->second);//map中的下标必须在前
+                result.push_back(i);
+                return result;
+            }
+            m[nums[i]]=i;//向map中插入数据，key为题给数值，value为数值在vector中的下标
+        }
+        return result;//没有实际作用，但不加会报错
+    }
+    
+
+
+
+
+    /*vector<int> twoSum(vector<int>& nums, int target) {//暴力解法 n*n=O(n²)
+        int i,j;
+        int flag=0;
+        vector<int> result; 
+        for(i=0; i<(nums.size()-1); i++){
+            for(j=i+1; j<nums.size(); j++)
+                if((nums[i]+nums[j])==target){
+                    flag=1;
+                    break;
+                } 
+            if(flag==1)break;
+        }
+        if(flag==0)
+            printf("NO TWOSUM!");
+        else{
+            result.push_back(i);
+            result.push_back(j);
+        }    
+        return result;   
+    }*/
+
+
+
+};
