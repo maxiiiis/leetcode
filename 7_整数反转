@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int reverse(int x) {//输入x为32位有符号整数（int类型），范围在[−2^31,  2^31 − 1]即[-2147483648,2147483647]、[INT_MIN,INT_MAX]
+        int rev=0;//反转后的数字也是int类型
+        int pop;
+        
+        
+        while(x!=0)//用数学方法反转数字(比将int型转换成string型再调用reverse(string.begin(),string.end())后再转换成int型更好)
+        {
+            pop=x%10;//取出x最低位的数字放入pop
+            x=x/10;//从x中删去数字pop(此处的除法/是向下取整)
+            //判断是否溢出(不能用rev>INT_MAX和rev<INT_MIN来判断，因为rev为int类型，若rev溢出，此时rev的值没有意义，不能用于比较)
+            //若把rev换成long long类型(long型32位，long long型64位)也不好，万一反转x后也不够用还是会溢出(实际上对本题，long long类型肯定够用)
+            if(rev>(INT_MAX/10)||(rev==(INT_MAX/10)&&pop>7)) return 0;//x为正数, rev*10+pop 会溢出只可能有2种情况(此时的rev一定是9位数)，1是rev大于INT_MAX的前9位(INT_MAX/10),2是rev等于INT_MAX的前9位且rev的第10位数pop>7(7是INT_MAX的第10位数) (实际上对本题，第2种情况不可能存在，因为若rev为214748364，则x只可能为0463847412或1463847412，即pop只可能为0或1)
+            if(rev<(INT_MIN/10)||(rev==(INT_MIN/10)&&pop<-8)) return 0;//x为负数同理
+            
+            rev=rev*10+pop;//把数字pop弹入rev  （不需要单独考虑正负，因为pop是带符号的）
+        }
+        
+        return rev;//无实际作用
+    }
+    
+    
+};
