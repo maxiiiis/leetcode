@@ -1,0 +1,42 @@
+class Solution {
+public:
+    /*
+    int maxArea(vector<int>& height) {//暴力法 O(n^2) 超时！
+        int max_capacity=0,capacity;
+        for(int i=0; i<height.size(); i++)
+            for(int j=i+1; j<height.size(); j++)
+            {
+                capacity=min(height[i],height[j])*(j-i);
+                max_capacity=max(max_capacity,capacity);                
+            }
+        return max_capacity;  
+    }
+    */
+    
+    int maxArea(vector<int>& height) {//首尾双指针法 O(n)
+        //暴力法的优化版本，有选择地遍历，指针由外向内移动，逐步淘汰不可能成为更大容量的边界线（移动指向短线的指针），以获得更大容量（也可能更小）
+        //在移动一个指针的条件下，水箱（矩形）的长减一，宽和面积的变化取决于移动的线
+        //若移动长线，则可能得到的线：（1）比原长线更长，则面积一定变小，因为宽还是原短线，而长减一 （2）比原长线短或相等，则面积一定变小
+        //若移动短线，则可能得到的线：（1）比原短线更长，则面积“可能”变大，因为宽一定变大，但因长减一，所以面积变化不一定 （2）比原短线短或相等，则面积一定变小
+        //综上，只有移动短线，才有可能获得更大容量；若两指针的线长度相等，则随便移动一条即可
+        //这种方法为什么不会遗漏最优解？
+        int start=0,end=height.size()-1;
+        int max_capacity=min(height[start],height[end])*(end-start);
+        int capacity;
+        
+        while(start<end)
+        {
+            if( height[start] < height[end] ) start++;//移动短线
+            else end--;
+            
+            capacity=min(height[start],height[end])*(end-start);
+            max_capacity=max(max_capacity,capacity);      
+        }
+        return max_capacity;
+    }
+    
+    
+    
+    
+    
+};
