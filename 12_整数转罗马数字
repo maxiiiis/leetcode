@@ -1,0 +1,51 @@
+class Solution {
+public:
+    /*
+    string intToRoman(int num) {//输入num的范围为[1,3999]
+        //对整数num逐位分配对应的罗马数字(从低到高或从高到低都可以)
+        //roman数组存储每个数位对应的罗马数字，从上到下分别为个、十、百、千位，从左到右分别是数字0~9
+        string roman[4][10] = { "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX",
+                                "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
+                                "", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
+                                "", "M", "MM", "MMM", "", "", "", "", "", ""};
+        string result;
+        
+        for(int i=0; num!=0; i++)//从低到高，逐位取num的低位数字
+        {
+            //注意 roman[i][num%10] 和 result 的前后关系，该语句表示把 字符串roman[i][num%10] 拼接到 result 的前面
+            //而 result += roman[i][num%10]; （等同于 result = result + roman[i][num%10];） 表示把 字符串roman[i][num%10] 拼接到 result 的后面
+            result = roman[i][num%10] + result;
+            num = num/10;
+        }
+        
+    return result;
+    }
+    */
+    
+    
+    
+    string intToRoman(int num) {
+        //将数字转换为罗马字符，实际上有一个暗含的规则：要用尽可能少的罗马字符来表示该数字
+        //举个例子，对数字523，应该用DXXIII来表示，而不是用523个I来表示
+        //为实现上述规则，在转换时应该操作如下：
+        //在数值{1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000}中，（可理解为纸币的面额1块、5块、10块……）（注意要把特殊的4、9、40、90……加进去）
+        //先用最接近数字num且小于等于它的面额来“尽可能大”地表示num，接着num减去被表示的部分，然后重复前面一步直到num为0（相当于从高位到低位）
+        //该方法为贪心算法？
+        
+        int nums[13]={1,4,5,9,10,40,50,90,100,400,500,900,1000};//比 map<int,string> m; 消耗的内存资源要少
+        string romans[13]={"I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"};
+        string result;
+        
+        for(int i=12; num!=0; i--)
+        {
+            for(int j=(num/nums[i]); j>0; j--)//(num/nums[i]) 是“尽可能大”地表示num时所需面额nums[i]的个数
+                result+=romans[i];
+            num-=nums[i]*(num/nums[i]);         
+        }
+        
+        return result;
+    }
+    
+    
+    
+};
