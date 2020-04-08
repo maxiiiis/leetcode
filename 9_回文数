@@ -5,15 +5,15 @@ public:
         
         int rev=0;//反转后的数字用int型，注意考虑溢出问题
         int pop;
-        int input=x;
-        while(input!=0)//此处x一定为正数
+        int input=x;//此处input为非负数
+        while(input!=0)
         {
             pop=input%10;
             input=input/10;
             if(rev>(INT_MAX/10)||(rev==(INT_MAX/10)&&pop>7)) return false;//回文一定不会溢出，因为输入的回文是int型，回文反转后还是自己本身，所以还在int的范围内；故溢出的一定不是回文
             rev=rev*10+pop;
         }
-        if(rev==x) return true;
+        if(rev==x) return true;//此语句也能满足0是回文数的判断
         else return false;
         
     }
