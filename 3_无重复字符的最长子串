@@ -1,0 +1,31 @@
+class Solution {//长度为n的字符串s的所有子串：可看作s[0]、s[1]、……、s[n-1]以及所有以它们开头的子串(从左往右)，共n+(n-1)+(n-2)+……+1个子串
+public:
+    int lengthOfLongestSubstring(string s) {//优化的暴力解法
+        int start=0,end=0;//字符串指针(都从0开始)
+        unordered_map<int,int> substring;//哈希查找O(1)
+        int length=0,maxlength=0;
+        while(end!=s.length())//注意循环结束条件
+        {
+            if(substring.find(s[end])==substring.end())//end指向的字符不在substring中
+            {
+                substring[s[end]]=end;//把end指向的字符插入substring(字符作为key,字符在字符串s中的下标作为value)
+                length++;
+                end++;
+            }
+            else//end指向的字符已存在
+            {
+                if(length>maxlength)
+                    maxlength=length;
+                //重置新子串
+                length=0;
+                start=substring[s[end]]+1;//start指向重复字符(第一次出现)的后一个字符（why：在新start到旧start所指向字符之间的所有字符，以它们开头的所有最长子串，都不可能比 以旧start指向字符开头的最长子串 更长）
+                end=start;                
+                substring.clear();//对于“substring[“key”]”这个语句来说，如果在substring（map类型）中不存在“key”所对应的元素，那么就会自动插入一个键为“key”的元素！所以“substring.clear();”一定要放在“start=substring[s[end]]+1;”后面
+            }  
+        }
+        if(length>maxlength)
+            maxlength=length;
+        
+       return maxlength; 
+    }
+};
