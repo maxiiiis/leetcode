@@ -39,7 +39,7 @@ public:
         for(int i=12; num!=0; i--)
         {
             for(int j=(num/nums[i]); j>0; j--)//(num/nums[i]) 是“尽可能大”地表示num时所需面额nums[i]的个数
-                result+=romans[i];
+                result+=romans[i];//除特殊面额外，大面额要放在小面额的前面
             num-=nums[i]*(num/nums[i]);         
         }
         
