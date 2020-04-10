@@ -1,0 +1,81 @@
+class Solution {
+public:
+    /*
+    string longestCommonPrefix(vector<string>& strs) {
+        //水平扫描法
+        //先比较字符串数组strs中的第一个和第二个字符串，得到它们的公共前缀，再将当前得到的公共前缀与数组strs中的下一个字符串比较，直到strs为空或公共前缀为空
+        
+        if( strs.empty() ) return "";//字符串数组为空的情况（区别于字符串数组中都是空串的情况）
+        
+        int prefix = strs[0].length()-1;//当前公共前缀的存放形式：用第一个字符串的位置下标表示 （比用string prefix存放效率更高）
+        for(int i=1; i<strs.size(); i++)
+        {
+            if( strs[i].empty() )//只要字符串数组中有一个字符串为空，则公共前缀就是空串“”
+                return "";
+            if(prefix==-1)//公共前缀为空 
+                break;
+            for(int j=0; j<strs[i].length() && j<=prefix; j++)//j的循环结束条件要同时考虑当前前缀和当前字符串的长度
+            {
+                if( strs[i][j] != strs[0][j] )
+                {
+                    prefix=j-1;
+                    break;
+                }
+                //考虑当前前缀长、当前字符串短且当前字符串就是新公共前缀本身的情况 （如当前前缀为“flower”，当前字符串为“flow”）
+                if( j==(strs[i].length()-1) )
+                    prefix=strs[i].length()-1;
+                //当前前缀短、当前字符串长（或者当前前缀和当前字符串一样长）且当前前缀就是新公共前缀本身的情况，不必单独列出来给prefix赋值，因为prefix相当于没改变
+                //如当前前缀为“flow”，当前字符串为“flower”（或者当前前缀为“flower”，当前字符串为“flower”）
+            }  
+        }
+        
+        if(prefix==-1) 
+            return "";
+        else
+            return strs[0].substr(0,prefix+1);
+
+    }
+    */
+    
+    
+    string longestCommonPrefix(vector<string>& strs) {
+        //垂直扫描法
+        //对字符串数组中所有字符串按列逐列进行比较(都与第一个字符串的列比较)，直到出现一个不同的字符 或 扫描到最短字符串的最后一列
+        
+        if( strs.empty() ) return "";//字符串数组为空的情况（区别于字符串数组中都是空串的情况）
+        
+        int prefix=-2;//最长公共前缀的存放形式：用第一个字符串的位置下标表示
+        int j,i;
+        
+        for(j=0; j<strs[0].length(); j++)
+        {
+            if(prefix!=-2)//判断prefix是否被赋过值
+                break;
+            for(i=1; i<strs.size() && j<strs[i].length(); i++)//循环结束条件中的 j<strs[i].length() 是为了保证当前字符串存在第j列
+            {
+                
+                if( strs[i][j] != strs[0][j])
+                {
+                    prefix=j-1;//此处对prefix的赋值可能为-1,0,1,2…… 所以prefix的初值不能设为-1
+                    break;
+                }
+                    
+            }
+            if( i<strs.size() && j==strs[i].length() )//特殊情况：上面的for循环是被当前第i个字符串没有第j列这一条件终止的 如{“flower”，“flowea”，“flow”}
+            {                                         // i<strs.size() 条件是为了防止后面的j==strs[i].length()条件中出现数组访问越界
+                prefix=strs[i].length()-1;
+                break;
+            }
+        }
+        
+        if( j==strs[0].length() &&　i==strs.size())//特殊情况：字符串数组中的所有字符串都相同
+            prefix=strs[0].length()-1;
+        
+        if(prefix==-2||prefix==-1)
+            return "";
+        else
+            return strs[0].substr(0,prefix+1);
+        
+    }
+    
+};
