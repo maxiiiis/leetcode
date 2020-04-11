@@ -68,7 +68,7 @@ public:
             }
         }
         
-        if( j==strs[0].length() &&　i==strs.size())//特殊情况：字符串数组中的所有字符串都相同
+        if( j==strs[0].length() &&　i==strs.size())//特殊情况：字符串数组中的所有字符串都相同(上面两层for循环都没有中断地执行到了最后)
             prefix=strs[0].length()-1;
         
         if(prefix==-2||prefix==-1)
