@@ -1,0 +1,186 @@
+/*     测试用例
+       vector<int> a={-1,0,1};
+       vector<int> b={-1,1,0};
+       vector<int> c={-1,0,1};
+
+       if(a==b)//输出different（整形数组int [3] 不能用=来区分）
+        cout<<"same"<<endl;
+       else
+        cout<<"different"<<endl;
+
+       if(a==c)//输出same
+        cout<<"same"<<endl;
+       else
+        cout<<"different"<<endl;
+
+        set<vector<int>> d;
+        cout<<d.size()<<endl;//输出0
+        d.insert(a);
+        cout<<d.size()<<endl;//输出1
+        d.insert(b);
+        cout<<d.size()<<endl;//输出2
+        d.insert(c);
+        cout<<d.size()<<endl;//输出2
+*/
+
+
+class Solution {
+public:
+    /*
+    struct pos{
+      int i;
+      int j;
+    };
+    
+    vector<vector<int>> threeSum(vector<int>& nums) { //超时！254/313
+        //求出nums数组中所有的两数之和放入twosum（unordered_multimap类型）中，再遍历nums数组中的数字，对每一个数字都在twosum中查找是否存在0-nums[i](可能存在多个)
+        
+        //multimap与map的区别在于：
+        //1、multimap可以存在重复的键，map不可以
+        //2、multimap不能用[]来访问、插入键值对，只能用insert()成员函数来插入，而map都可以
+        unordered_multimap<int,pos> twosum;
+        unordered_multimap<int,pos>::iterator iter_start,iter_end,temp;
+        for(int i=0; i<nums.size(); i++)
+            for(int j=i+1; j<nums.size(); j++)
+                twosum.insert(pair<int,pos>(nums[i]+nums[j],{i,j}));//key为两数之和，value为两数在nums数组中的位置下标
+                
+        //整数数组nums中可能会存在相同值的数字，所以一定要去重处理
+        //满足条件的三元组合可能会存在相同值的数字，所以类型要为vector<int>，而不是set<int>
+        set<vector<int>> no_repeat;//set用于去重,不允许存在相同的元素（实际为键值对）
+        
+        for(int i=0; i<nums.size(); i++)//遍历nums数组中的数字
+        {
+            int diff_zero=0-nums[i];
+            //equal_range()返回的是一个pair对象，类型为pair<unordered_multimap<int,pos>::iterator,unordered_multimap<int,pos>::iterator>
+            pair<unordered_multimap<int,pos>::iterator,unordered_multimap<int,pos>::iterator> pair1=twosum.equal_range(diff_zero);//哈希查找O(1)
+            iter_start=pair1.first;
+            iter_end=pair1.second;
+            
+            for(temp=iter_start; temp!=iter_end; temp++)//遍历twosum中的重复键的键值对(这种迭代器temp++的方式也适用于无序容器unordered_multimap)
+            {
+                if((i!=temp->second.i) && (i!=temp->second.j))//两数之和的两数不能是当前遍历到的数字nums[i]（值可能一样，但位置不能相同）
+                {
+                    vector<int> a={nums[i],nums[temp->second.i],nums[temp->second.j]};
+                    sort(a.begin(),a.end());//一定要排序，用于去重(sort()函数默认升序)
+                    no_repeat.insert(a);//去重插入三元组合
+                }
+            }
+        }
+        
+        vector<vector<int>> threesum_zero(no_repeat.begin(),no_repeat.end());//把set中的内容复制到vector中
+        return threesum_zero;
+    }
+    */
+    
+    
+    /*
+    vector<vector<int>> threeSum(vector<int>& nums) {//超时！311/313
+        //暴力法：三指针遍历所有的三元组合(组合共C(n,3)个)，判断当前组合之和是否为0，注意要去重处理
+        
+        set<vector<int>> no_repeat;//set用于去重,不允许存在相同的元素（实际为键值对）
+           
+        for(int i=0; i<nums.size(); i++)
+            for(int j=i+1; j<nums.size(); j++)
+                for(int k=j+1; k<nums.size(); k++)
+                    if( (nums[i]+nums[j]+nums[k])==0 )
+                    {
+                        vector<int> temp={nums[i],nums[j],nums[k]};
+                        sort(temp.begin(),temp.end());//一定要排序，用于去重(sort()函数默认升序)
+                        no_repeat.insert(temp);//去重插入三元组合
+                        break;//一旦找到，则k指针就不必继续后移，因为对组合[nums[i],nums[j],---]来说，和为0所对应的---是唯一的，而k后面的数字要么与当前nums[k]重复，要么不可能与当前组合的和为0(即使break了也还是要去重)
+                    }
+        
+        vector<vector<int>> threesum_zero(no_repeat.begin(),no_repeat.end());//把set中的内容复制到vector中
+        return threesum_zero;
+    }
+    */
+   
+    /*
+    vector<vector<int>> threeSum(vector<int>& nums) {//超时！311/313
+        //暴力法的优化版本1（利用数组有序的性质，通过指针++去重，比利用set去重大大提升了效率）
+        //先对nums数组进行升序排序，三指针遍历过程有如下要求：
+        //1. i指针一定的情况下，若找到一组满足条件的数字，则j指针要向右移，直到指向第一个值不为原nums[j]的数字 （去重操作）
+        //（如nums数组排序后为[-2,1,1,1,2,3]，对i指向-2的情况下，当找到[-2,1,1]后，j应指向2而不是第二个1，若j指向第二个1，则会插入重复的三元组合）
+        //2. 若当前i指针的所有组合已遍历完成，则i指针要向右移，直到指向第一个值不为原nums[i]的数字 （去重操作）
+        //3. 若当前i指针所对应的数字nums[i]>0，则遍历结束（因为nums数组有序，nums[i]后面的数字也一定>0，三个大于0的数之和不可能为0）
+        
+        vector<vector<int>> result;
+        
+        sort(nums.begin(),nums.end());
+        
+        for(int i=0; i<nums.size(); i++)
+        {
+            if(nums[i]>0)
+                break;
+            if( (i!=0) && (nums[i-1]==nums[i]))//(i!=0)条件要放在前面，防止数组访问越界
+                continue;
+            for(int j=i+1; j<nums.size(); j++)
+            {
+                if( (j!=i+1) && (nums[j-1]==nums[j]) )// (j!=i+1)条件是为了防止漏解，如nums[-1,-1,0,1,2],i指向第一个-1，j初始指向第二个-1，若没有(j!=i+1)条件，则j会跳过-1从而错过解[-1,-1,2]
+                    continue;
+                for(int k=j+1; k<nums.size(); k++)
+                {
+                    if( (nums[i]+nums[j]+nums[k])==0 )
+                    {
+                        vector<int> temp={nums[i],nums[j],nums[k]};
+                        result.push_back(temp);
+                        break;//一旦找到，则k指针就不必继续后移，因为对组合[nums[i],nums[j],---]来说，和为0所对应的---是唯一的，而k后面的数字要么与当前nums[k]重复，要么不可能与当前组合的和为0(即使break了也还是要去重)
+                    }
+                }
+            } 
+        }
+        
+        return result;
+    }
+    */
+    
+    
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        //暴力法的优化版本2：改进优化版本1，在i指针一定的情况下，对j、k实行首尾双指针法（可参考11_盛最多水的容器）
+        //1. 在i一定的情况下，
+        //(1) 遍历时起始要让j指向i的后一个数字，k指向最后一个数字，两指针由外向内移动，逐步淘汰不可能使和为0的数字
+        //(2) 若当前j和k所指的两数之和小于(0-nums[i])，则j要向右移一位；若大于(0-nums[i])，则k要向左移一位
+        //（因为数组是有序的，若当前两数之和小于(0-nums[i])，则说明当前nums[j]即使加上了“当前所有组合中最大的数”——最后一个数字也不够大，所以[nums[i],nums[j],---]这一组合不可能和为0，则j可以淘汰这一组合，向右移一位寻求更大的数；k左移一位同理）
+        //(3)若找到一组满足条件的数字，即当前j和k所指的两数之和等于(0-nums[i])，则j指针要向右移，直到指向第一个值不为原nums[j]的数字；k指针要向左移，直到指向第一个值不为原nums[k]的数字，从而继续寻找下一组数字（去重操作）
+        //2. 若当前i指针的所有组合已遍历完成（即j<k不成立），则i指针要向右移，直到指向第一个值不为原nums[i]的数字 （去重操作）
+        //3. 若当前i指针所对应的数字nums[i]>0，则遍历结束（因为nums数组有序，nums[i]后面的数字也一定>0，三个大于0的数之和不可能为0）
+        
+        
+        vector<vector<int>> result;
+        
+        if(nums.size()<3)return result;//此句不加也行，但是加了会快点
+        
+        sort(nums.begin(),nums.end());
+        
+        for(int i=0; i<nums.size(); i++)
+        {
+            if(nums[i]>0)
+                break;
+            if( (i!=0) && (nums[i-1]==nums[i]))
+                continue;
+            
+            int j=i+1,k=nums.size()-1;
+            while(j<k)//此处不加(j<nums.size())和(k>=0)条件也能满足特殊情况，如nums.size()为1或2
+            {
+                if( (nums[j]+nums[k]) < (0-nums[i]) )
+                    j++;
+                else if( (nums[j]+nums[k]) > (0-nums[i]) )
+                    k--;
+                else if( (nums[j]+nums[k]) == (0-nums[i]) )
+                {
+                    vector<int> temp={nums[i],nums[j],nums[k]};
+                    result.push_back(temp);
+                    do{
+                        j++;
+                    }while( (j<nums.size()) && (nums[j-1]==nums[j]) );//(j<nums.size())条件要放在前面，防止数组访问越界 (如nums[0,0,0])
+                    do{
+                        k--;
+                    }while( (k>=0) && (nums[k]==nums[k+1]) );//(k>=0)条件要放在前面，防止数组访问越界 
+                }          
+            } 
+        } 
+        return result;
+    }
+    
+    
+};
