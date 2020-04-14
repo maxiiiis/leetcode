@@ -156,7 +156,7 @@ public:
         {
             if(nums[i]>0)
                 break;
-            if( (i!=0) && (nums[i-1]==nums[i]))
+            if( (i!=0) && (nums[i-1]==nums[i]))//(i!=0)条件要放在前面，防止数组访问越界
                 continue;
             
             int j=i+1,k=nums.size()-1;
