@@ -1,0 +1,62 @@
+class Solution {
+public:
+    int threeSumClosest(vector<int>& nums, int target) {//默认nums数组的size大于等于3？
+        //可参考15_三数之和的最后一种解法，在15题中可视为target=0，且与target相等可看作与其无穷接近
+        //暴力法的优化版本：先对nums数组升序排序，在i指针一定的情况下，对j、k实行首尾双指针法，以淘汰那些不可能比当前组合更接近target、剩下未遍历的组合，从而加快遍历速度
+        
+        
+        if( nums.size()==3)//此句不加也行，但是加了会快点
+            return nums[0]+nums[1]+nums[2];
+        
+         //将closest_sum的初值设为int类型的最值，是为了当遍历到第一个三元组合时，使abs(nums[i]+nums[j]+nums[k]-target) < abs(closest_sum-target)恒成立，从而把第一个三元组合之和赋值给closest_sum
+        //但要注意，若初值不恰当，则可能会导致 closest_sum-target 溢出 
+        //如若target>0，会导致 INT_MIN-target溢出；若target<0，会导致 INT_MAX-target溢出
+        //值得注意的是，当target=0时，可将初值设为INT_MAX或INT_MIN+1，但不可设为INT_MIN，因为此时abs(closest_sum-target)=abs(closest_sum),而abs(INT_MIN)=INT_MIN=-2147483648，无法将第一个三元组合之和赋值给closest_sum
+        //PS:数字是以补码形式存放，而abs(x)将x转换成非负数的原理实际是对x的补码进行如下操作：若x<0，则将符号位从1转换为0，再将剩下位全部取反再加一（如-1的补码为1111，转换后为0001即1）
+        //而INT_MIN的补码为1000……000，按上述规则转换后还是1000……000；换个角度想，int型的范围为[-2147483648,2147483647]，若将INT_MIN转换成正数214748648，也超出了int的数据范围
+        int closest_sum;
+        if(target>=0)
+            closest_sum=INT_MAX;
+        else
+            closest_sum=INT_MIN;
+       
+        
+        sort(nums.begin(),nums.end());
+        
+        for(int i=0; i<nums.size(); i++)
+        {
+            //若target<0，则包含负数的组合之和一定比只包含非负数的组合之和更接近target，但有可能存在nums数组只有非负数的情况，所以当target<0时，可以让i遍历完第一个非负数的所有组合后就结束循环
+            if( (target<0) &&　(i!=0)　&& (nums[i-1]>=0) )
+                return closest_sum;
+            
+            //若当前i指针的所有组合已遍历完成（即j<k不成立），则i指针要向右移，直到指向第一个值不为原nums[i]的数字（此时不是去重，而是避免重复的循环）
+            if( (i!=0) && (nums[i-1]==nums[i]))//(i!=0)条件要放在前面，防止数组访问越界；另一个作用是防止还没遍历就跳过了nums数组开头值相同的数字
+                continue;
+            
+            
+            int j=i+1,k=nums.size()-1;
+            while(j<k)
+            {
+                if( (nums[j]+nums[k]) < (target-nums[i]) )//当前两数之和小于(target-nums[i])，则说明当前nums[j]即使加上了“当前所有组合”中最大的数也不够大，而k剩下未遍历的组合只会比当前组合更小，即剩下的组合之和只会离target越远，则j可以用当前组合更新完closest_sum后，就不必再遍历剩下的k，而是向右移一位寻求更大的数
+                {
+                    if( abs(nums[i]+nums[j]+nums[k]-target) < abs(closest_sum-target) )//更新closest_sum
+                        closest_sum=nums[i]+nums[j]+nums[k];
+                    j++;
+                }
+                    
+                else if( (nums[j]+nums[k]) > (target-nums[i]) )//当前两数之和大于(target-nums[i])，则说明当前nums[k]即使加上了“当前所有组合”中最小的数也不够小，而当前包含nums[k]的、剩下未遍历的组合只会比当前组合更大，即剩下的组合之和只会离target越远，则k可以用当前组合更新完closest_sum后，就不必再遍历剩下包含nums[k]的组合，而是向左移一位寻求更小的数
+                {
+                    if( abs(nums[i]+nums[j]+nums[k]-target) < abs(closest_sum-target) )//更新closest_sum
+                        closest_sum=nums[i]+nums[j]+nums[k];
+                    k--;
+                }
+                    
+                else if( (nums[j]+nums[k]) == (target-nums[i]) )//与target无穷接近即与其相等，若找到三数之和等于target，即找到了最接近target的组合
+                {
+                    return target; 
+                }          
+            } 
+        } 
+        return closest_sum; 
+    }
+};
