@@ -1,0 +1,30 @@
+class Solution {
+public:
+    bool isValid(string s) {
+        //类似于编译器的括号匹配问题，一般都是使用栈来解决(后进先出)
+        //从左往右遍历字符串s,把左括号压入栈,右括号与栈顶元素比较看是否为同一类型,若是同类型则将栈顶元素弹出栈,继续遍历s直到最后一个字符；若不是同类型（或栈为空）,则可判断s无效
+        //当s遍历完成,若栈为空,则可判断s有效；否则则判断s无效（如："(()"）
+        stack<char> Stack;
+        for(int i=0; i<s.size(); i++)
+        {
+            if(s[i]=='(' or s[i]=='{' or s[i]=='[')
+                Stack.push(s[i]);
+            else if(s[i]==')' or s[i]=='}' or s[i]==']')
+            {
+                switch(s[i])
+                {       case ')' : if( !Stack.empty() && Stack.top() == '(') Stack.pop();//当栈为空时,不能使用top()来访问栈顶元素
+                                   else return false;
+                                   break;
+                        case '}' : if( !Stack.empty() && Stack.top() == '{') Stack.pop();
+                                   else return false;
+                                   break;
+                        case ']' : if( !Stack.empty() && Stack.top() == '[') Stack.pop();
+                                   else return false;                    
+                                   break;      
+                }    
+            } 
+        }
+        if(Stack.empty()) return true;
+        else return false; 
+    }
+};
