@@ -1,0 +1,88 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        //递归法：一个函数在运行过程中直接或间接地调用自己，但不能无限地调用，必须要有终止条件
+        //设l1、l2链表的长度分别为m、n,每次递归调用确定新链表的一个节点,最多递归调用(压栈)m+n次,所以时间复杂度为O(m+n),空间复杂度为O(m+n)
+        
+        //处理特殊情况：l1、l2有一个为空或l1、l2全为空(递归结束条件)(ps:l1、l2全为空的情况只会出现在第一次调用该函数)
+        if(l1==NULL) return l2;
+        else if(l2==NULL) return l1;
+        
+        //l1、l2都不为空
+        if(l1->val<=l2->val)
+        {
+            l1->next=mergeTwoLists(l1->next,l2);//l1当前所指节点确定为新链表的节点,递归调用函数mergeTwoLists(),将以l1的下一个节点为首的链表和l2链表合并成新'的升序链表返回,并使l1节点指向该新'链表
+            return l1;
+        }
+        else
+        {
+            l2->next=mergeTwoLists(l1,l2->next);//l2当前所指节点确定为新链表的节点,递归调用函数mergeTwoLists(),将以l2的下一个节点为首的链表和l1链表合并成新'的升序链表返回,并使l2节点指向该新'链表
+            return l2;
+        }
+    }
+    
+    
+    
+    
+    /*
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        //迭代法：是一种不断地用变量的旧值递推新值的过程，每一次迭代得到的结果会作为下一次迭代的初始值
+        //逐个比较两个链表节点的值,较小节点确定为新链表的节点,且该节点所在链表的指针向后移一个节点,直到两个链表有一个为空,则将非空链表直接连到新链表后
+        //设l1、l2链表的长度分别为m、n,每次循环迭代确定新链表的一个节点,最多迭代m+n次,所以时间复杂度为O(m+n),又因为只需存放一些变量,所以空间复杂度为O(m+n)
+        
+        //处理特殊情况：l1、l2有一个为空或l1、l2全为空
+        if(l1==NULL) return l2;
+        else if(l2==NULL) return l1;
+        
+        //l1、l2都不为空
+        ListNode* head;//指向新链表的首个节点(非头节点)
+        ListNode* prev;//指向新链表当前得到的最后一个节点（上一次迭代的结果）
+        //赋予head和prev初值
+        if(l1->val<=l2->val)
+        {
+            head=l1;
+            l1=l1->next;
+            prev=head; 
+        }
+        else
+        {
+            head=l2;
+            l2=l2->next;
+            prev=head; 
+        }
+        //l1或l2其中一个为空时就停止循环（不可能同时为空）
+        while( l1!=NULL && l2!=NULL )
+        {
+            if(l1->val<=l2->val)
+            {
+                prev->next=l1;
+                prev=prev->next;
+                l1=l1->next;
+            }
+            else
+            {
+                prev->next=l2;
+                prev=prev->next;
+                l2=l2->next;
+            } 
+        }
+        //把非空的链表直接连到新链表后，不必再比较
+        if(l1==NULL) prev->next=l2;
+        else if(l2==NULL) prev->next=l1;
+        
+        return head;  
+    }
+    */
+   
+    
+};
